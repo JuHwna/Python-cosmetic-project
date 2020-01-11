@@ -28,18 +28,28 @@
 |화장품 크롤링 및 전처리, PPT제작|김수헌|
 |화장품 크롤링 및 전처리, PPT제작, 모델학습|노주영|
 
+### (4) 시스템 아키텍처
+![시스템 아키텍처2](https://user-images.githubusercontent.com/49123169/72203117-f9e76e80-34aa-11ea-9a89-6bc2eb66af84.PNG)
+* AWS 환경에서 해당 프로젝트를 진행했습니다.
 
-### (4) 시스템 아키텍처 - 구성도
-![시스템 아키텍처](https://user-images.githubusercontent.com/49123169/72203031-ceb04f80-34a9-11ea-8dcf-44019f948cd4.PNG)
-* 휴대폰으로 화장품을 사진으로 촬영하여 이미지를 업로드합니다. 
-* 업로드된 이미지를 분석하여 정확한 제품을 인식하고 그 제품의 화장품 성분을 찾아 매칭시킵니다.
-* 매칭시킨 정보를 사용자에게 바로 알려주는 순서로 진행됩니다.
-
-### (5) 시스템 아키텍처
+|System|사용|
+|----------------------------------------|-------------------------------------------|
+|AWS 사용환경| Amazon SageMaker|
+|WEB |Flask|
+|Deep Learning|Keras|
+|DataBase|MySQL|
+|Data preprocessing|OpenCV, Pandas, NumPy, PIL|
+|Crawling|Selenium, BeautifulSoup|
 
 
 ### (5) 화장품 서비스
 #### 이름 : 화분
 ![화분](https://user-images.githubusercontent.com/49123169/65417295-b18d3d80-de34-11e9-839e-7aa1304072ad.png)
+
+#### 작동 방법
+![시스템 아키텍처](https://user-images.githubusercontent.com/49123169/72203031-ceb04f80-34a9-11ea-8dcf-44019f948cd4.PNG)
+* 휴대폰으로 화장품을 사진으로 촬영하여 이미지를 업로드합니다. 
+* 업로드된 이미지를 분석하여 정확한 제품을 인식하고 그 제품의 화장품 성분을 찾아 매칭시킵니다.
+* 매칭시킨 정보를 사용자에게 바로 알려주는 순서로 진행됩니다.
 
 ## 4. 프로젝트 목표
