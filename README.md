@@ -155,8 +155,6 @@ https://github.com/opencv/opencv/tree/master/data/haarcascades
 해당 깃허브 주소에서 사람 얼굴을 찾는데 도움을 주는 data가 있습니다. 해당 data를 이용하여 사람 얼굴이 들어간 사진들을 모두 추출했습니다.
 
 ~~~~
-
-
 for i in range(len(drjart)):
     path1 = "./djart/{}".format(drjart[i])
     file_list1 = os.listdir(path1)
