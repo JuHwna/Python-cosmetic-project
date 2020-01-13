@@ -5,7 +5,8 @@
 
 
 ## 2. 실시
-경희대빅데이터연구소
+### 1)장소 : 경희대빅데이터연구소
+### 2)프로젝트 진행 날짜 : 2019.08.12 ~ 2019.08.28
 <br />
 
 
@@ -204,12 +205,73 @@ for i in range(len(drjart)):
 3. 이미지 사이즈 조정
 * 학습시킬 이미지가 모두 같은 크기여야지 학습할 수 있습니다. 그러므로 이를 맞추는 작업이 필요했습니다.
 * 사진의 크기는 250x250으로 정해놓았습니다. 250x250으로 바꿀 때 정사이즈로 줄이거나 늘려서 이미지 크기를 맞추었습니다.
-  늘리거나 줄일 때 나타나는 빈 공간은 흰 바탕을 추가하여 공간을 매꾸었습니다.
+  늘리거나 줄일 때 나타나는 빈 공간은 검정색 바탕을 추가하여 공간을 매꾸었습니다.
   
 ~~~
-
+workDIr = os.path.abspath('./drjart/')
+size = 300, 300 
+for (path, dirname,files) in os.walk(workDIr):
+    os.mkdir(path+'/300x300')
+    for f in files: 
+        ext = os.path.splitext(f) 
+        upper_ext = ext[1] 
+        outfile = os.path.join(path+'/300x300', f.split('.')[0]+ '_300x300' + upper_ext)
+        try: 
+            new_img = Image.new("RGB", (300,300), "black") 
+            im = Image.open(os.path.join(path,f)) 
+            im.thumbnail(size, Image.ANTIALIAS) 
+            load_img = im.load() 
+            load_newimg = new_img.load() 
+            i_offset = (300 - im.size[0]) / 2 
+            j_offset = (300 - im.size[1]) / 2 
+            for i in range(0, im.size[0]): 
+                for j in range(0, im.size[1]): 
+                    load_newimg[i + i_offset,j + j_offset] = load_img[i,j] 
+                if(upper_ext == '.JPEG' or upper_ext == '.JPG'): 
+                    new_img.save(outfile, "JPEG") 
+                elif(upper_ext == '.png'): 
+                    new_img.save(outfile, "png") 
+        except IOError: 
+            print( "cannot create thumbnail for '%s'" % os.path.join(path, f))
 ~~~
 
 ## 6. 모델 구축
-### 1) X axis flip & Rotation 
-* 이미지 데이터를 250
+* 전처리한 결과, 얻은 화장품 이미지 개수가 각각 70개 정도였습니다. 이 정도의 양으로는 학습시키기 부족하다고 판단하여 
+  Image Augmentation(이미지 변조)를 통해 학습 데이터를 늘렸습니다.
+  
+### 1) 초기 모델(자체 제작 모델)  
+#### (1) X axis flip & Rotation 
+* 먼저 변조 방식으로 좌우 반전과 회전(90,180,270)을 해서 총 이미지 개수를 4배로 늘렸습니다.
+  (나중에 깨달은 것은 회전의 경우, 회전해도 외형이 차이가 나지 않는 원이나 정사각형만 회전하는 것이 맞다는 사실을 알게 되었습니다.
+  컴퓨터의 경우, 외형이 다른 제품에서 1도만 회전해도 다른 물체로 인식한다는 사실......)
+* 그 후, Keras 기반으로 CNN 모형을 돌렸습니다.
+
+~~~
+# 초창기 모델
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3,3), padding='same',activation='relu', input_shape=(250,250,3)))
+model.add(MaxPooling2D(pool_size=(2,2))
+model.add(Conv2D(64, kernel_size=(3,3), padding='same',activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2))
+model.add(Conv2D(128, kernel_size=(3,3), padding='same',activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2))
+model.add(Conv2D(256, kernel_size=(3,3), padding='same', activation=df['Conv03_act'][0]))
+model.add(MaxPooling2D(pool_size=(2,2))
+model.add(Flatten())
+model.add(Dense(128,activation='relu'))
+model.add(Dense(33, activation='softmax'))
+model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+history = model.fit(x_train, y_train, batch_size=30, epochs=30, verbose=1, validation_split=0.2)
+his_list.append(history)
+score = model.evaluate(x_test, y_test, verbose=0)
+loss_list.append(score[0])
+acc_list.append(score[1])
+~~~
+
+* 이 후, 여러 변수들을 조절하거나 층을 더 쌓으며 예측률을 올리기 위해 노력했습니다.
+
+|Model|Average Accuracy|
+|-------------|----------------|
+|3 Conv 3 Fc|0.612|
+|5 Conv 3 Fc|0.762|
+|7 Conv 5 Fc|0.826|
