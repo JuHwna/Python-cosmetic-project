@@ -209,15 +209,15 @@ for i in range(len(drjart)):
   
 ~~~
 workDIr = os.path.abspath('./drjart/')
-size = 300, 300 
+size = 250, 250 
 for (path, dirname,files) in os.walk(workDIr):
-    os.mkdir(path+'/300x300')
+    os.mkdir(path+'/250x250')
     for f in files: 
         ext = os.path.splitext(f) 
         upper_ext = ext[1] 
-        outfile = os.path.join(path+'/300x300', f.split('.')[0]+ '_300x300' + upper_ext)
+        outfile = os.path.join(path+'/250x250', f.split('.')[0]+ '_300x300' + upper_ext)
         try: 
-            new_img = Image.new("RGB", (300,300), "black") 
+            new_img = Image.new("RGB", (250,250), "black") 
             im = Image.open(os.path.join(path,f)) 
             im.thumbnail(size, Image.ANTIALIAS) 
             load_img = im.load() 
@@ -279,7 +279,7 @@ acc_list.append(score[1])
 
 ![첫번째 flip rotation](https://user-images.githubusercontent.com/49123169/72247814-13b6bc00-3639-11ea-8ee1-b7a90f944a81.PNG)
 
-* 최대로 올렸을 때 *82%* 까지 올렸습니다. 하지만 그 이상 올라갈 기미가 보이지 않아 다른 방법이 필요해보였습니다. 
+* 최대로 올렸을 때 **82%** 까지 올렸습니다. 하지만 그 이상 올라갈 기미가 보이지 않아 다른 방법이 필요해보였습니다. 
   그래서 다른 방법을 찾기 위해 구글링 작업을 시작했습니다.
 ~~~
 # 80퍼 근처 코드
@@ -322,10 +322,40 @@ loss_list.append(score[0])
 acc_list.append(score[1])
 ~~~
 
-#### (2) X axis flip & Crop
+#### (2) Crop
 * 다른 방법을 찾던 도중 **ImageNet Classification with Deep Convolutional Neural Networks** 이라는 논문에서 crop이라는 방법을 볼 수 있었습니다.
 >The first form of data augmentation consists of generating image translations and horizontal reflections. We do this by extracting random 224 × 224 patches (and their horizontal reflections) from the 256×256 images and training our network on these extracted patches4
 . This increases the size of our training set by a factor of 2048, though the resulting training examples are, of course, highly interdependent. Without this scheme, our network suffers from substantial overfitting, which would have forced us to use much smaller networks. At test time, the network makes a prediction by extracting five 224 × 224 patches (the four corner patches and the center patch) as well as their horizontal reflections (hence ten patches in all), and averaging the predictions made by the network’s softmax
 layer on the ten patches.
 
+* Crop은 Image Augmentation 방법 중 하나로 주된 대상을 놔두고 주변을 일정 부분 자르는 방법입니다. 이 방법을 통해 부족한 데이터 셋을 4배로 늘릴 수 있습니다. 해당 이미지 변조 방식이 저희 상황에 딱 맞아 떨어져 바로 이미지 전처리 작업으로 돌아가 crop을 진행했습니다.
+~~~
+out_220 = imgs[:,15:235,15:235,:]
+# print(out.shape)
+img1 = imgs[:,:220,:220,:]
+img2 = imgs[:,:220,30:250,:]
+img3 = imgs[:,30:250,:220,:]
+img4 = imgs[:,30:250,30:250,:]
+list = [img1,img2,img3,img4]
+for i in list:
+    print(i.shape)
+    out_220 = np.concatenate((out_220,i),axis=0)
+~~~
 
+* 원래는 처음에는 crop과 좌우 반전 사진을 다 컴퓨터에 저장하려고 했으나 프로젝트 마감일이 별로 남지 않아서 행렬을 통해 이미지를 부풀렸습니다. 그런데 crop까지는 잘 진행했으나 4배 부풀린 상태에서 flip까지 하려고 하니 aws 이용 환경에 한계를 느끼는 걸 발견했고 colab도 마찬가지라서 4배 부풀린 것만 사용했습니다.
+* 또한 기존에 250x250에서 220x220으로 이미지 사이즈가 작아져서 약간의 코드를 수정한 후 모델을 돌렸습니다.
+* 이를 초기모델에 사용한 결과, 예측률 80퍼가 나오는 모습을 확인할 수 있었고 가능성이 있다고 보아 여러 번 변수를 조절하고 층을 쌓았더니 95%까지 올릴 수 있었습니다.
+
+|Model|Average Accuracy|
+|-------------|----------------|
+|3 Conv 3 Fc|0.80|
+|5 Conv 5 Fc|0.906|
+|6 Conv 5 Fc|0.955|
+
+![image](https://user-images.githubusercontent.com/49123169/72247869-2df09a00-3639-11ea-9576-57401c518410.png)
+
+### 2) VGG16 + Transfer Learning Tuning 
+* 만족스러운 예측률을 얻고 그만 두는 과정 속에서 유명한 모델과 어떤 차이가 나는지를 보고 싶었습니다.
+* 유명한 모델 중 VGG16 모델을 골라 학습을 진행했습니다.
+* 학습된 가중치가 없을 때는 5%도 나오지 않아 모델 잘 구축했다는 생각을 가졌습니다.
+* 하지만 ImageNet의 가중치를 가지고 와서 학습을 진행했는데 97%라는 엄청난 예측률을 얻었습니다.
