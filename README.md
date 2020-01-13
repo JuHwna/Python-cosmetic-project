@@ -250,13 +250,13 @@ for (path, dirname,files) in os.walk(workDIr):
 # 초창기 모델
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3,3), padding='same',activation='relu', input_shape=(250,250,3)))
-model.add(MaxPooling2D(pool_size=(2,2))
+model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Conv2D(64, kernel_size=(3,3), padding='same',activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2))
+model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Conv2D(128, kernel_size=(3,3), padding='same',activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2))
-model.add(Conv2D(256, kernel_size=(3,3), padding='same', activation=df['Conv03_act'][0]))
-model.add(MaxPooling2D(pool_size=(2,2))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(256, kernel_size=(3,3), padding='same', activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Flatten())
 model.add(Dense(128,activation='relu'))
 model.add(Dense(33, activation='softmax'))
@@ -275,3 +275,51 @@ acc_list.append(score[1])
 |3 Conv 3 Fc|0.612|
 |5 Conv 3 Fc|0.762|
 |7 Conv 5 Fc|0.826|
+
+![첫번째 flip rotation](https://user-images.githubusercontent.com/49123169/72247814-13b6bc00-3639-11ea-8ee1-b7a90f944a81.PNG)
+
+* 최대로 올렸을 때 0.826까지 올렸습니다. 하지만 그 이상 올라갈 기미가 보이지 않아 다른 방법이 필요해보였습니다. 
+  그래서 다른 방법을 찾기 위해 구글링 작업을 시작했습니다.
+~~~
+# 80퍼 근처 코드
+
+
+
+model = Sequential()
+model.add(Conv2D(32,kernel_size=(2,2), padding='same',activation='relu', input_shape=(250,250,3),kernel_initializer='he_normal')))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(64, kernel_size=(2,2), padding='same',activation='relu',kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(128, kernel_size=(2,2), padding='same',activation='relu',kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(256, kernel_size=(2,2), padding='same',activation='relu',kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(256, kernel_size=(2,2), padding='same', activation='relu', kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(512, kernel_size=(2,2), padding='same', activation='relu', kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(1024, kernel_size=(2,2), padding='same', activation='relu', kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(2048, kernel_size=(2,2), padding='same', activation='relu', kernel_initializer='he_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(1024,activation='relu', kernel_initializer='he_normal'))
+model.add(Dense(512,activation='relu', kernel_initializer='he_normal'))
+model.add(Dense(256,activation='relu', kernel_initializer='he_normal'))
+model.add(Dense(128,activation='relu', kernel_initializer='he_normal'))
+model.add(Dense(33, activation='relu', kernel_initializer='he_normal'))
+model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+history = model.fit(x_train, y_train, batch_size=64, epochs=100, verbose=1, validation_split=0.2)
+his_list.append(history)
+score = model.evaluate(x_test, y_test, verbose=0)
+loss_list.append(score[0])
+acc_list.append(score[1])
+~~~
