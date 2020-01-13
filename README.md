@@ -75,9 +75,9 @@
 * 화장품 성분에 대한 등급을 수집하기 위해 EWG라는 미국의 비영리 단체의 자료를 수집했습니다.
 ![ewg 그림](https://user-images.githubusercontent.com/49123169/72205661-3f1a9900-34c9-11ea-894d-0e913900601d.png)
 
-* 이 사이트에는 1~10등급까지 성분에 대한 등급표가 나오기 때문에 저희 프로젝트에 적합한 자료라고 생각하여 크롤링을 통해 자료를 수집했습니다. 크롤링으로는 *Selenium*과 *Beautifulsoup*을 사용했습니다. 
-  * *Selenium*을 사용한 이유는 ewg의 사이트에서 성분을 수집하기 위해선 화장품을 클릭한 후에 성분을 수집해야 합니다. 동적 크롤링에서는 selenium이 최적이기 때문에 크롤링 속도가 느리더라고 이 방법을 사용했습니다.
-  * *Beautifulsoup*을 사용한 이유는 화장품 성분 등급표를 가지고 오려고 했기 때문입니다. 성분 등급표가 이미지파일로 되어 있기 때문에 이를 숫자만 가지고 오기 위해서는 이미지 링크를 통해 얻어야 했습니다. selenium의 경우 링크에 대한 정보를 가져오는 것이 힘들었습니다. 그에 비해 beautifulsoup은 링크 가져오는 것이 꽤 쉬웠고 분리하는 과정도 쉬웠습니다. 그래서 등급표만 beautifulsoup을 사용했습니다.
+* 이 사이트에는 1~10등급까지 성분에 대한 등급표가 나오기 때문에 저희 프로젝트에 적합한 자료라고 생각하여 크롤링을 통해 자료를 수집했습니다. 크롤링으로는 **Selenium**과 **Beautifulsoup**을 사용했습니다. 
+  * **Selenium**을 사용한 이유는 ewg의 사이트에서 성분을 수집하기 위해선 화장품을 클릭한 후에 성분을 수집해야 합니다. 동적 크롤링에서는 selenium이 최적이기 때문에 크롤링 속도가 느리더라고 이 방법을 사용했습니다.
+  * **Beautifulsoup**을 사용한 이유는 화장품 성분 등급표를 가지고 오려고 했기 때문입니다. 성분 등급표가 이미지파일로 되어 있기 때문에 이를 숫자만 가지고 오기 위해서는 이미지 링크를 통해 얻어야 했습니다. selenium의 경우 링크에 대한 정보를 가져오는 것이 힘들었습니다. 그에 비해 beautifulsoup은 링크 가져오는 것이 꽤 쉬웠고 분리하는 과정도 쉬웠습니다. 그래서 등급표만 beautifulsoup을 사용했습니다.
 <br />
 
 ~~~
@@ -127,7 +127,7 @@ for j in range(0,10000,10):
 
 (2) 화장품 성분 수집(분류할 화장품 성분) 
 * 7개의 브랜드(CHANEL, BOBBI BROWN, ESTEE LAUDER, ETUDE HOUSE, innisfree, MISSHA, Dr.Jart), 
-  5개의 제품군(스킨,로션, 선크림, 클렌징, 크림)을 사용하여 33개의 화장품을 분류할 계획을 세웠습니다.
+  5개의 제품군(스킨,로션, 선크림, 클렌징, 크림)을 사용하여 **33개의 화장품**을 분류할 계획을 세웠습니다.
 * 그래서 해당 제품의 성분들을 추출하기 위해서 각 홈페이지에 들어가 크롤링 작업을 실시했습니다.
 * 해당 작업은 다른 팀원들이 진행하여 코드를 가지고 있지 않습니다.
 ![화장품 성분 이름](https://user-images.githubusercontent.com/49123169/72216271-61142a00-3562-11ea-9cdd-d580c9ddbd7a.PNG)
@@ -170,7 +170,7 @@ for j in range(0,10000,10):
 (3) 화장품 이미지 전처리
 * 수집한 화장품 이미지 데이터를 다 사용하기에는 부적합했습니다. 그 이유가 사람 얼굴, 인형 얼굴 등 화장품에 비해 과도하게 이미지에서
   차지하는 비중이 많은 사진들이 많았습니다. 그래서 이것들을 삭제하거나 일부분만 수집하는 과정을 거쳤습니다.
-1. OpenCV를 활용
+1. **OpenCV**를 활용
 https://github.com/opencv/opencv/tree/master/data/haarcascades
 해당 깃허브 주소에서 사람 얼굴을 찾는데 도움을 주는 data가 있습니다. 해당 data를 이용하여 사람 얼굴이 들어간 사진들을 모두 추출했습니다.
 
@@ -237,14 +237,15 @@ for (path, dirname,files) in os.walk(workDIr):
 
 ## 6. 모델 구축
 * 전처리한 결과, 얻은 화장품 이미지 개수가 각각 70개 정도였습니다. 이 정도의 양으로는 학습시키기 부족하다고 판단하여 
-  Image Augmentation(이미지 변조)를 통해 학습 데이터를 늘렸습니다.
+  **Image Augmentation(이미지 변조)** 를 통해 학습 데이터를 늘렸습니다.
   
 ### 1) 초기 모델(자체 제작 모델)  
 #### (1) X axis flip & Rotation 
-* 먼저 변조 방식으로 좌우 반전과 회전(90,180,270)을 해서 총 이미지 개수를 4배로 늘렸습니다.
-  (나중에 깨달은 것은 회전의 경우, 회전해도 외형이 차이가 나지 않는 원이나 정사각형만 회전하는 것이 맞다는 사실을 알게 되었습니다.
-  컴퓨터의 경우, 외형이 다른 제품에서 1도만 회전해도 다른 물체로 인식한다는 사실......)
-* 그 후, Keras 기반으로 CNN 모형을 돌렸습니다.
+* 먼저 변조 방식으로 **좌우 반전과 회전(90,180,270)** 을 해서 총 이미지 개수를 4배로 늘렸습니다.
+  
+  *(나중에 깨달은 것은 회전의 경우, 회전해도 외형이 차이가 나지 않는 원이나 정사각형만 회전하는 것이 맞다는 사실을 알게 되었습니다.*
+  *컴퓨터의 경우, 외형이 다른 제품에서 1도만 회전해도 다른 물체로 인식한다는 사실......)*
+* 그 후, **Keras 기반으로 CNN 모형**을 돌렸습니다.
 
 ~~~
 # 초창기 모델
@@ -278,13 +279,10 @@ acc_list.append(score[1])
 
 ![첫번째 flip rotation](https://user-images.githubusercontent.com/49123169/72247814-13b6bc00-3639-11ea-8ee1-b7a90f944a81.PNG)
 
-* 최대로 올렸을 때 0.826까지 올렸습니다. 하지만 그 이상 올라갈 기미가 보이지 않아 다른 방법이 필요해보였습니다. 
+* 최대로 올렸을 때 *82%* 까지 올렸습니다. 하지만 그 이상 올라갈 기미가 보이지 않아 다른 방법이 필요해보였습니다. 
   그래서 다른 방법을 찾기 위해 구글링 작업을 시작했습니다.
 ~~~
 # 80퍼 근처 코드
-
-
-
 model = Sequential()
 model.add(Conv2D(32,kernel_size=(2,2), padding='same',activation='relu', input_shape=(250,250,3),kernel_initializer='he_normal')))
 model.add(BatchNormalization())
@@ -323,3 +321,11 @@ score = model.evaluate(x_test, y_test, verbose=0)
 loss_list.append(score[0])
 acc_list.append(score[1])
 ~~~
+
+#### (2) X axis flip & Crop
+* 다른 방법을 찾던 도중 **ImageNet Classification with Deep Convolutional Neural Networks** 이라는 논문에서 crop이라는 방법을 볼 수 있었습니다.
+>The first form of data augmentation consists of generating image translations and horizontal reflections. We do this by extracting random 224 × 224 patches (and their horizontal reflections) from the 256×256 images and training our network on these extracted patches4
+. This increases the size of our training set by a factor of 2048, though the resulting training examples are, of course, highly interdependent. Without this scheme, our network suffers from substantial overfitting, which would have forced us to use much smaller networks. At test time, the network makes a prediction by extracting five 224 × 224 patches (the four corner patches and the center patch) as well as their horizontal reflections (hence ten patches in all), and averaging the predictions made by the network’s softmax
+layer on the ten patches.
+
+
